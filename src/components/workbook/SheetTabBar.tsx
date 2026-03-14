@@ -1,5 +1,5 @@
 import type { Sheet } from "../../types/workbook";
-import { sheetTabStyles } from "./styles/workbook.styles";
+import { tabStyles } from "./workbook.styles";
 
 interface SheetTabBarProps {
   sheets: Sheet[];
@@ -22,11 +22,9 @@ export function SheetTabBar({
           <button
             key={sheet.id}
             onClick={() => onSheetChange(sheet.id)}
-            className={
-              isActive ? sheetTabStyles.active : sheetTabStyles.inactive
-            }
+            className={isActive ? tabStyles.active : tabStyles.inactive}
           >
-            {sheet.name}
+            <span className="max-w-36 truncate font-bold">{sheet.name}</span>
           </button>
         );
       })}

@@ -15,15 +15,22 @@ export function WorkbookShell({
   toolbar,
   children,
 }: WorkbookShellProps) {
-  const { activeWorkbook, activeSheet, switchWorkbook, switchSheet } =
-    useWorkbook(workbooks);
+  const {
+    workbooks: activeWorkbooks,
+    activeWorkbook,
+    activeSheet,
+    switchWorkbook,
+    switchSheet,
+    removeWorkbook,
+  } = useWorkbook(workbooks);
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
       <WorkbookTabBar
-        workbooks={workbooks}
+        workbooks={activeWorkbooks}
         activeWorkbookId={activeWorkbook?.id}
         onWorkbookChange={switchWorkbook}
+        onWorkbookRemove={removeWorkbook}
       />
 
       <div className="flex flex-col flex-1 overflow-hidden">
