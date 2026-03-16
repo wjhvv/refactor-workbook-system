@@ -7,7 +7,7 @@ import type {
   ParsedRow,
   ParsedColumn,
 } from "../../types/excel";
-import { resolveMergeSpan, resolveValue } from "./excelCell";
+import { resolveMergeSpan, resolveValue } from "./cellResolver";
 
 export async function parseExcel(file: File): Promise<ParsedWorkbook> {
   const buffer = await file.arrayBuffer();
