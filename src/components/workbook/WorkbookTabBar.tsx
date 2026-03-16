@@ -1,5 +1,6 @@
+import { useRef } from "react";
 import type { Workbook } from "../../types/workbook";
-import { Trash2, Download } from "lucide-react";
+import { Trash2, Download, Plus } from "lucide-react";
 import { tabStyles } from "./workbook.styles";
 import { IconButton } from "../ui/IconButton";
 
@@ -8,6 +9,8 @@ interface WorkbookTabBarProps {
   activeWorkbookId: string | undefined;
   onWorkbookChange: (workbookId: string) => void;
   onWorkbookRemove: (workbookId: string) => void;
+  onWorkbookDownload: (workbookId: string) => void;
+  onAddWorkbook: (files: File[]) => void;
 }
 
 export function WorkbookTabBar({
@@ -15,7 +18,17 @@ export function WorkbookTabBar({
   activeWorkbookId,
   onWorkbookChange,
   onWorkbookRemove,
+  onWorkbookDownload,
+  onAddWorkbook,
 }: WorkbookTabBarProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length > 0) onAddWorkbook(files);
+    e.target.value = "";
+  }
+
   return (
     <div className="flex items-end border-b border-gray-200 overflow-x-auto">
       {workbooks.map((workbook) => {
@@ -31,7 +44,10 @@ export function WorkbookTabBar({
               <IconButton
                 icon={Download}
                 variant="primary"
-                onClick={() => {}}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onWorkbookDownload(workbook.id);
+                }}
               />
               <IconButton
                 icon={Trash2}
@@ -42,6 +58,22 @@ export function WorkbookTabBar({
           </button>
         );
       })}
+
+      <input
+        ref={inputRef}
+        type="file"
+        accept=".xlsx,.xls,.csv"
+        multiple
+        onChange={handleChange}
+        className="hidden"
+      />
+      <span className="self-center ml-2">
+        <IconButton
+          icon={Plus}
+          size={18}
+          onClick={() => inputRef.current?.click()}
+        />
+      </span>
     </div>
   );
 }
