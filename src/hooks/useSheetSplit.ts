@@ -4,6 +4,7 @@ import type { LoadedWorkbook } from "../types/workbook";
 import type { SplitTable } from "../types/displayTable";
 import { groupByColumn } from "../services/excel/groupByColumn";
 import { groupByRow } from "../services/excel/groupByRow";
+import { getMaxGroupNumber } from "../utils/groupUtils";
 
 export type SplitMode = "column" | "row" | null;
 
@@ -68,7 +69,7 @@ function deriveGroups(
 
 export function useSheetSplit(
   workbooks: LoadedWorkbook[],
-  headerMap: Record<string, Record<string, number | null>>,
+  headerMap: Record<string, Record<string, { headerRowIndex: number | null }>>,
 ): Record<string, Record<string, SheetSplitState>> {
   const [splitStateMap, setSplitStateMap] = useState<SplitStateMap>({});
 
@@ -100,7 +101,7 @@ export function useSheetSplit(
     for (const lw of workbooks) {
       const wid = lw.descriptor.id;
       for (const sheet of lw.parsed.sheets) {
-        if (prev[wid]?.[sheet.name] !== headerMap[wid]?.[sheet.name]) {
+        if (prev[wid]?.[sheet.name]?.headerRowIndex !== headerMap[wid]?.[sheet.name]?.headerRowIndex) {
           sheetsToReset.push({ workbookId: wid, sheetName: sheet.name });
         }
       }
@@ -176,7 +177,7 @@ export function useSheetSplit(
           lw.parsed.sheets.map((sheet) => {
             const { splitMode, splitColKey, rowGroupMap } =
               splitStateMap[workbookId]?.[sheet.name] ?? INITIAL_SPLIT_PARAMS;
-            const headerRowIndex = headerMap[workbookId]?.[sheet.name] ?? null;
+            const headerRowIndex = headerMap[workbookId]?.[sheet.name]?.headerRowIndex ?? null;
 
             const cached = splitCacheRef.current[workbookId]?.[sheet.name];
             const isHit =
@@ -200,10 +201,7 @@ export function useSheetSplit(
                 splitColKey,
                 rowGroupMap,
               );
-              maxGroup = Object.values(rowGroupMap).reduce(
-                (max, v) => (v > max ? v : max),
-                0,
-              );
+              maxGroup = getMaxGroupNumber(rowGroupMap);
               if (splitMode === "column") {
                 displayRowGroupMap = {};
                 splitTables.forEach((table, i) => {

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { getGroupColor } from "../constants/groupColors";
 import { GroupPainterDropdown } from "../components/ui/Dropdown";
 import { GroupPill, ReadOnlyPill } from "../components/ui/GroupPill";
+import { getMaxGroupNumber } from "../utils/groupUtils";
 
 interface UseRowGroupPainterOptions {
   rowGroupMap: Record<number, number>;
@@ -24,10 +25,6 @@ export interface RowGroupPainter {
 }
 
 // ─── Pure helpers ─────────────────────────────────────────────────────────────
-
-function getMaxGroupNumber(rowGroupMap: Record<number, number>): number {
-  return Object.values(rowGroupMap).reduce((m, v) => (v > m ? v : m), 0);
-}
 
 function canAddGroupToSelection(
   selection: number[],

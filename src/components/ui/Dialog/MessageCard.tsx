@@ -29,3 +29,12 @@ export function MessageCard({ title, message, onClose, closeLabel = "確認" }: 
     </div>
   );
 }
+
+export function MessageDialog({ isOpen, ...cardProps }: MessageCardProps & { isOpen: boolean }) {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+      <MessageCard {...cardProps} />
+    </div>
+  );
+}

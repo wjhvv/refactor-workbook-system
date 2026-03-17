@@ -41,3 +41,12 @@ export function ConfirmCard({
     </div>
   );
 }
+
+export function ConfirmDialog({ isOpen, ...cardProps }: ConfirmCardProps & { isOpen: boolean }) {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+      <ConfirmCard {...cardProps} />
+    </div>
+  );
+}

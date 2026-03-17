@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@tanstack/react-virtual": "^3.13.22",
+    "@types/jszip": "^3.4.0",
     "exceljs": "^4.4.0",
+    "jszip": "^3.10.1",
     "lucide-react": "^0.577.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",

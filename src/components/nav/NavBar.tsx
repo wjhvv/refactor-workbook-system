@@ -17,17 +17,20 @@ export function NavBar({ title, logoUrl }: NavBarProps) {
         <span className={navStyles.title}>{title}</span>
       </div>
       <div className={navStyles.items}>
-        {routes.map((route) => (
-          <Link
-            key={route.path}
-            to={route.path}
-            className={
-              pathname === route.path ? navStyles.itemActive : navStyles.item
-            }
-          >
-            {route.label}
-          </Link>
-        ))}
+        {routes.map((route) => {
+          const Icon = route.icon;
+          const isActive = pathname === route.path;
+          return (
+            <Link
+              key={route.path}
+              to={route.path}
+              className={isActive ? navStyles.itemActive : navStyles.item}
+            >
+              {Icon && <Icon size={14} />}
+              {route.label}
+            </Link>
+          );
+        })}
       </div>
     </nav>
   );
