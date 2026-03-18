@@ -124,6 +124,7 @@ export function WorkspacePicker({
                     onEditCancel={() => setEditing(null)}
                     onRemove={(e) => {
                       e.stopPropagation();
+                      closeAndReset();
                       deleteConfirm.open(ws.id);
                     }}
                   />

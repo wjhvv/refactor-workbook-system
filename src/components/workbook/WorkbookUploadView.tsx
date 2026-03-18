@@ -15,14 +15,12 @@ export function WorkbookUploadView() {
   if (loadedWorkbooks.length === 0) {
     return (
       <EmptyState centered>
-        <div className="w-full max-w-lg">
-          <UploadZone
-            onUpload={(files) => files.forEach(registry.addWorkbook)}
-            accept=".xlsx,.xls,.csv"
-            multiple
-            hint="Supports .xlsx, .xls, .csv"
-          />
-        </div>
+        <UploadZone
+          onUpload={(files) => files.forEach(registry.addWorkbook)}
+          accept=".xlsx,.xls,.csv"
+          multiple
+          hint="Supports .xlsx, .xls, .csv"
+        />
       </EmptyState>
     );
   }

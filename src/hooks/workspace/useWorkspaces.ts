@@ -38,8 +38,13 @@ export function useWorkspaces() {
   const removeWorkspace = useCallback(
     async (id: string) => {
       await service.remove(id);
-      setWorkspaces((prev) => prev.filter((w) => w.id !== id));
-      if (activeId === id) setActiveId(null);
+      setWorkspaces((prev) => {
+        const next = prev.filter((w) => w.id !== id);
+        if (activeId === id) {
+          setActiveId(next[0]?.id ?? null);
+        }
+        return next;
+      });
     },
     [activeId],
   );
