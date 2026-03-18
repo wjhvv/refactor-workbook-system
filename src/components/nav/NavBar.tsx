@@ -13,7 +13,9 @@ export function NavBar({ title, logoUrl }: NavBarProps) {
   return (
     <nav className={navStyles.base}>
       <div className={navStyles.brand}>
-        {logoUrl && <img src={logoUrl} alt="logo" className={navStyles.logoImage} />}
+        {logoUrl && (
+          <img src={logoUrl} alt="logo" className={navStyles.logoImage} />
+        )}
         <span className={navStyles.title}>{title}</span>
       </div>
       <div className={navStyles.items}>
