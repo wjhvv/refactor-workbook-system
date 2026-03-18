@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { getGroupColor } from "../constants/groupColors";
-import { GroupPainterDropdown } from "../components/ui/Dropdown";
-import { GroupPill, ReadOnlyPill } from "../components/ui/GroupPill";
-import { getMaxGroupNumber } from "../utils/groupUtils";
+import { useClickOutside } from "../ui/useClickOutside";
+import { getGroupColor } from "../../constants/groupColors";
+import { GroupPainterDropdown } from "../../components/ui/Dropdown";
+import { GroupPill, ReadOnlyPill } from "../../components/ui/GroupPill";
+import { getMaxGroupNumber } from "../../utils/groupUtils";
 
 interface UseRowGroupPainterOptions {
   rowGroupMap: Record<number, number>;
@@ -119,16 +120,7 @@ export function useRowGroupPainter({
     return () => document.removeEventListener("mouseup", handleMouseUp);
   }, []);
 
-  useEffect(() => {
-    if (!dropdownPos) return;
-    function handleClickOutside(e: MouseEvent) {
-      if (!dropdownRef.current?.contains(e.target as Node)) {
-        closeDropdown();
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [dropdownPos, closeDropdown]);
+  useClickOutside(dropdownRef, closeDropdown, !!dropdownPos);
 
   const handlePillMouseDown = useCallback(
     (e: React.MouseEvent, rowIndex: number) => {

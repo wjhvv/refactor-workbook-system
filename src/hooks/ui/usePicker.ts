@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import type { LabelValue } from "../types/pickerOption";
+import type { LabelValue } from "../../types/pickerOption";
 
 export function usePicker<T = string>(
   options: LabelValue<T>[],

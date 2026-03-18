@@ -7,5 +7,6 @@ export function useDisclosure() {
     isOpen,
     open: () => setIsOpen(true),
     close: () => setIsOpen(false),
+    toggle: () => setIsOpen((v) => !v),
   };
 }

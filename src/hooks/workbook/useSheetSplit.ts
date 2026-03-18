@@ -1,21 +1,20 @@
 import { useState, useRef, useMemo, useCallback } from "react";
-import type { ParsedSheet } from "../types/excel";
-import type { LoadedWorkbook } from "../types/workbook";
-import type { SplitTable } from "../types/displayTable";
-import { groupByColumn } from "../services/excel/groupByColumn";
-import { groupByRow } from "../services/excel/groupByRow";
-import { getMaxGroupNumber } from "../utils/groupUtils";
+import type { ParsedSheet } from "../../types/excel";
+import type { LoadedWorkbook } from "../../types/workbook";
+import type { SplitTable } from "../../types/displayTable";
+import { groupByColumn } from "../../services/excel/groupByColumn";
+import { groupByRow } from "../../services/excel/groupByRow";
+import { getMaxGroupNumber } from "../../utils/groupUtils";
+import { updateNested2 } from "../../utils/nestedState";
 
 export type SplitMode = "column" | "row" | null;
 
-// 內部: 儲存「如何分組」的條件, 不存計算後的結果
 interface SheetSplitParams {
   splitMode: SplitMode;
   splitColKey: string | null;
   rowGroupMap: Record<number, number>;
 }
 
-// 對外: 設定 + 計算後的表格資料 + 操作函數
 export interface SheetSplitState {
   splitMode: SplitMode;
   splitColKey: string | null;
@@ -27,7 +26,6 @@ export interface SheetSplitState {
   paintRows: (indices: number[], groupNum: number) => void;
 }
 
-// 透過快取記憶上一次的計算結果
 interface SplitDerivedCache {
   headerRowIndex: number | null;
   splitMode: SplitMode;
@@ -38,10 +36,7 @@ interface SplitDerivedCache {
   displayRowGroupMap: Record<number, number>;
 }
 
-/** workbookId → sheetName → SheetSplitParams */
 type SplitStateMap = Record<string, Record<string, SheetSplitParams>>;
-
-/** workbookId → sheetName → SplitDerivedCache */
 type SplitCacheMap = Record<string, Record<string, SplitDerivedCache>>;
 
 const EMPTY_GROUPS: SplitTable[] = [];
@@ -73,7 +68,6 @@ export function useSheetSplit(
 ): Record<string, Record<string, SheetSplitState>> {
   const [splitStateMap, setSplitStateMap] = useState<SplitStateMap>({});
 
-  // 當新 workbook 加入時，在 render 期間同步初始化
   const prevWorkbookIdsRef = useRef<Set<string>>(new Set());
   const newWorkbooks = workbooks.filter(
     (lw) => !prevWorkbookIdsRef.current.has(lw.descriptor.id),
@@ -91,7 +85,6 @@ export function useSheetSplit(
     });
   }
 
-  // 當 headerMap 改變時，重置受影響 sheet 的 split 狀態
   const prevHeaderMapRef = useRef(headerMap);
   if (prevHeaderMapRef.current !== headerMap) {
     const prev = prevHeaderMapRef.current;
@@ -123,25 +116,20 @@ export function useSheetSplit(
 
   const setSplitMode = useCallback(
     (workbookId: string, sheetName: string, mode: SplitMode) => {
-      setSplitStateMap((prev) => ({
-        ...prev,
-        [workbookId]: {
-          ...prev[workbookId],
-          [sheetName]: { splitMode: mode, splitColKey: null, rowGroupMap: {} },
-        },
-      }));
+      updateNested2(setSplitStateMap, workbookId, sheetName, {
+        splitMode: mode,
+        splitColKey: null,
+        rowGroupMap: {},
+      });
     },
     [],
   );
 
   const setSplitColKey = useCallback(
     (workbookId: string, sheetName: string, colKey: string | null) => {
-      setSplitStateMap((prev) => ({
-        ...prev,
-        [workbookId]: {
-          ...prev[workbookId],
-          [sheetName]: { ...prev[workbookId]?.[sheetName], splitColKey: colKey },
-        },
+      updateNested2(setSplitStateMap, workbookId, sheetName, (prev) => ({
+        ...(prev ?? INITIAL_SPLIT_PARAMS),
+        splitColKey: colKey,
       }));
     },
     [],
@@ -149,19 +137,13 @@ export function useSheetSplit(
 
   const paintRows = useCallback(
     (workbookId: string, sheetName: string, indices: number[], groupNum: number) => {
-      setSplitStateMap((prev) => {
-        const next = { ...(prev[workbookId]?.[sheetName]?.rowGroupMap ?? {}) };
+      updateNested2(setSplitStateMap, workbookId, sheetName, (prev) => {
+        const next = { ...(prev?.rowGroupMap ?? {}) };
         for (const idx of indices) {
           if (groupNum === 0) delete next[idx];
           else next[idx] = groupNum;
         }
-        return {
-          ...prev,
-          [workbookId]: {
-            ...prev[workbookId],
-            [sheetName]: { ...prev[workbookId]?.[sheetName], rowGroupMap: next },
-          },
-        };
+        return { ...(prev ?? INITIAL_SPLIT_PARAMS), rowGroupMap: next };
       });
     },
     [],
@@ -194,13 +176,7 @@ export function useSheetSplit(
             if (isHit) {
               ({ splitTables, maxGroup, displayRowGroupMap } = cached);
             } else {
-              splitTables = deriveGroups(
-                sheet,
-                headerRowIndex,
-                splitMode,
-                splitColKey,
-                rowGroupMap,
-              );
+              splitTables = deriveGroups(sheet, headerRowIndex, splitMode, splitColKey, rowGroupMap);
               maxGroup = getMaxGroupNumber(rowGroupMap);
               if (splitMode === "column") {
                 displayRowGroupMap = {};
@@ -234,12 +210,9 @@ export function useSheetSplit(
                 splitTables,
                 maxGroup,
                 displayRowGroupMap,
-                setSplitMode: (mode: SplitMode) =>
-                  setSplitMode(workbookId, sheet.name, mode),
-                setSplitColKey: (colKey: string | null) =>
-                  setSplitColKey(workbookId, sheet.name, colKey),
-                paintRows: (indices: number[], groupNum: number) =>
-                  paintRows(workbookId, sheet.name, indices, groupNum),
+                setSplitMode: (mode: SplitMode) => setSplitMode(workbookId, sheet.name, mode),
+                setSplitColKey: (colKey: string | null) => setSplitColKey(workbookId, sheet.name, colKey),
+                paintRows: (indices: number[], groupNum: number) => paintRows(workbookId, sheet.name, indices, groupNum),
               } satisfies SheetSplitState,
             ];
           }),

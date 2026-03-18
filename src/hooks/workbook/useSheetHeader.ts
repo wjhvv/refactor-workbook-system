@@ -1,9 +1,9 @@
 import { useState, useRef, useMemo } from "react";
-import type { ParsedRow, ParsedSheet } from "../types/excel";
-import type { ColumnDef } from "../types/displayTable";
-import type { LoadedWorkbook } from "../types/workbook";
-import { detectHeaderBySelection } from "../services/excel/headerDetector";
-import { HEADER_DETECTION_STATUS } from "../types/displayTable";
+import type { ParsedRow, ParsedSheet } from "../../types/excel";
+import type { ColumnDef } from "../../types/displayTable";
+import type { LoadedWorkbook } from "../../types/workbook";
+import { detectHeaderBySelection } from "../../services/excel/headerDetector";
+import { HEADER_DETECTION_STATUS } from "../../types/displayTable";
 
 export interface SheetHeaderState {
   headerRowIndex: number | null;
@@ -61,9 +61,9 @@ export function useSheetHeader(
     setHeaderStateMap((prev) => {
       const next = { ...prev };
       for (const lw of newWorkbooks) {
-        // 為該 workbook 底下的所有 sheet 初始化為 null 狀態
+        // 預設以第一列為表頭
         next[lw.descriptor.id] = Object.fromEntries(
-          lw.parsed.sheets.map((s) => [s.name, null]),
+          lw.parsed.sheets.map((s) => [s.name, s.rows[0]?.index ?? null]),
         );
       }
       return next;

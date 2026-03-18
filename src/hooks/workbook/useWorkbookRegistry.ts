@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
-import { parseExcel } from "../services/excel/parser";
-import type { Workbook, LoadedWorkbook } from "../types/workbook";
+import { parseExcel } from "../../services/excel/parser";
+import type { Workbook, LoadedWorkbook } from "../../types/workbook";
 
 export interface WorkbookRegistry {
   loadedWorkbooks: LoadedWorkbook[];
