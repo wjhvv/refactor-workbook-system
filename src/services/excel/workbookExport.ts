@@ -20,6 +20,17 @@ interface SheetSplitSnapshot {
   splitTables: SplitTable[];
 }
 
+// ─── Download helper ──────────────────────────────────────────────────────────
+
+function triggerDownload(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 100);
+}
+
 // ─── Build ────────────────────────────────────────────────────────────────────
 
 /**
@@ -96,16 +107,23 @@ async function buildWorkbookBuffer(worksheets: WorksheetData[]): Promise<ArrayBu
   return wb.xlsx.writeBuffer();
 }
 
-function triggerBlobDownload(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 100);
-}
-
 // ─── Public API ───────────────────────────────────────────────────────────────
+
+const XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+/** Download an arbitrary set of sheets as a .xlsx file. */
+export async function downloadExcel(
+  sheets: { name: string; rows: unknown[][] }[],
+  filename: string,
+): Promise<void> {
+  const wb = new ExcelJS.Workbook();
+  for (const s of sheets) {
+    const ws = wb.addWorksheet(s.name.slice(0, 31));
+    for (const row of s.rows) ws.addRow(row as ExcelJS.CellValue[]);
+  }
+  const buffer = await wb.xlsx.writeBuffer();
+  triggerDownload(new Blob([buffer], { type: XLSX_MIME }), filename);
+}
 
 /** Export a single workbook as a .xlsx download. */
 export async function exportWorkbook(
@@ -117,12 +135,7 @@ export async function exportWorkbook(
   const worksheets = buildWorksheets(lw, tableStateMap, splitStateMap);
   if (worksheets.length === 0) return;
   const buffer = await buildWorkbookBuffer(worksheets);
-  triggerBlobDownload(
-    new Blob([buffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    }),
-    filename,
-  );
+  triggerDownload(new Blob([buffer], { type: XLSX_MIME }), filename);
 }
 
 /** Export all workbooks as a single .zip download. */
@@ -148,5 +161,5 @@ export async function exportAllAsZip(
   );
 
   const blob = await zip.generateAsync({ type: "blob" });
-  triggerBlobDownload(blob, filename);
+  triggerDownload(blob, filename);
 }

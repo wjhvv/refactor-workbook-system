@@ -1,10 +1,10 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import type { Workbook } from "../../types/workbook";
 import { Trash2, Download, Plus } from "lucide-react";
 import { tabStyles } from "./workbook.styles";
 import { IconButton } from "../ui/IconButton";
-import { ConfirmDialog } from "../ui/Dialog/ConfirmCard";
-import { useDisclosure } from "../../hooks/useDisclosure";
+import { ConfirmDialog } from "../ui/Dialog";
+import { useDeleteConfirm } from "../../hooks/ui/useDeleteConfirm";
 
 interface WorkbookTabBarProps {
   workbooks: Workbook[];
@@ -24,8 +24,7 @@ export function WorkbookTabBar({
   onAddWorkbook,
 }: WorkbookTabBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const confirm = useDisclosure();
-  const [pendingRemoveId, setPendingRemoveId] = useState<string | null>(null);
+  const deleteConfirm = useDeleteConfirm<string>();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
@@ -33,23 +32,7 @@ export function WorkbookTabBar({
     e.target.value = "";
   }
 
-  function requestRemove(workbookId: string) {
-    setPendingRemoveId(workbookId);
-    confirm.open();
-  }
-
-  function handleConfirmRemove() {
-    if (pendingRemoveId) onWorkbookRemove(pendingRemoveId);
-    confirm.close();
-    setPendingRemoveId(null);
-  }
-
-  function handleCancelRemove() {
-    confirm.close();
-    setPendingRemoveId(null);
-  }
-
-  const pendingWorkbook = workbooks.find((w) => w.id === pendingRemoveId);
+  const pendingWorkbook = workbooks.find((w) => w.id === deleteConfirm.pending);
 
   return (
     <>
@@ -77,7 +60,7 @@ export function WorkbookTabBar({
                   variant="danger"
                   onClick={(e) => {
                     e.stopPropagation();
-                    requestRemove(workbook.id);
+                    deleteConfirm.open(workbook.id);
                   }}
                 />
               </div>
@@ -94,20 +77,19 @@ export function WorkbookTabBar({
           className="hidden"
         />
         <span className="self-center ml-2">
-          <IconButton
-            icon={Plus}
-            size={18}
-            onClick={() => inputRef.current?.click()}
-          />
+          <IconButton icon={Plus} size={18} onClick={() => inputRef.current?.click()} />
         </span>
       </div>
 
       <ConfirmDialog
-        isOpen={confirm.isOpen}
+        isOpen={deleteConfirm.isOpen}
         title="刪除 Workbook"
         message={`確定要刪除「${pendingWorkbook?.name ?? ""}」嗎？此操作無法復原。`}
-        onClose={handleCancelRemove}
-        onConfirm={handleConfirmRemove}
+        onClose={deleteConfirm.close}
+        onConfirm={() => {
+          if (deleteConfirm.pending) onWorkbookRemove(deleteConfirm.pending);
+          deleteConfirm.close();
+        }}
       />
     </>
   );

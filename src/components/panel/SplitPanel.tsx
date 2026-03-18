@@ -1,4 +1,4 @@
-import type { SplitMode } from "../../hooks/useSheetSplit";
+import type { SplitMode } from "../../hooks/workbook/useSheetSplit";
 import { TogglePanel } from "./TogglePanel";
 
 const SPLIT_MODES: { value: NonNullable<SplitMode>; label: string }[] = [

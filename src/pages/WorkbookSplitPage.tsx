@@ -5,10 +5,10 @@ import { UploadZone } from "../components/ui/UploadZone";
 import { EmptyState } from "../components/ui/EmptyState";
 import { WideButton } from "../components/ui/WideButton";
 import { SplittedTable } from "../components/table/SplittedTable";
-import { useWorkbookRegistry } from "../hooks/useWorkbookRegistry";
-import { useSheetHeader } from "../hooks/useSheetHeader";
-import { useSheetSplit } from "../hooks/useSheetSplit";
-import { useWorkbookExport } from "../hooks/useWorkbookExport";
+import { useWorkbookRegistry } from "../hooks/workbook/useWorkbookRegistry";
+import { useSheetHeader } from "../hooks/workbook/useSheetHeader";
+import { useSheetSplit } from "../hooks/workbook/useSheetSplit";
+import { useWorkbookExport } from "../hooks/workbook/useWorkbookExport";
 
 export function WorkbookSplitPage() {
   const registry = useWorkbookRegistry();
