@@ -1,5 +1,5 @@
-import { X } from "lucide-react";
-import { IconButton } from "../IconButton";
+import { DialogCard } from "./DialogCard";
+import { DialogOverlay } from "./DialogOverlay";
 import { cardStyles } from "./card.styles";
 
 interface ConfirmCardProps {
@@ -20,33 +20,33 @@ export function ConfirmCard({
   cancelLabel = "取消",
 }: ConfirmCardProps) {
   return (
-    <div className={cardStyles.base}>
-      <div className={cardStyles.header}>
-        <span className={cardStyles.headerTitle}>{title}</span>
-        <IconButton variant="ghost" icon={X} onClick={onClose} />
-      </div>
-      {message && (
-        <div className={cardStyles.body}>
-          <p className={cardStyles.message}>{message}</p>
-        </div>
-      )}
-      <div className={cardStyles.footer}>
-        <button className={cardStyles.cancelButton} onClick={onClose}>
-          {cancelLabel}
-        </button>
-        <button className={cardStyles.confirmButton} onClick={onConfirm}>
-          {confirmLabel}
-        </button>
-      </div>
-    </div>
+    <DialogCard
+      title={title}
+      onClose={onClose}
+      footer={
+        <>
+          <button className={cardStyles.cancelButton} onClick={onClose}>
+            {cancelLabel}
+          </button>
+          <button className={cardStyles.confirmButton} onClick={onConfirm}>
+            {confirmLabel}
+          </button>
+        </>
+      }
+    >
+      {message && <p className={cardStyles.message}>{message}</p>}
+    </DialogCard>
   );
 }
 
-export function ConfirmDialog({ isOpen, ...cardProps }: ConfirmCardProps & { isOpen: boolean }) {
+export function ConfirmDialog({
+  isOpen,
+  ...cardProps
+}: ConfirmCardProps & { isOpen: boolean }) {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+    <DialogOverlay>
       <ConfirmCard {...cardProps} />
-    </div>
+    </DialogOverlay>
   );
 }

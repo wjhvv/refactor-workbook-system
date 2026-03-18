@@ -9,7 +9,9 @@ export const cardStyles = {
   message: "text-sm text-gray-500 leading-relaxed text-left",
   footer:
     "flex items-center justify-between px-5 py-2 border-t border-gray-100 mt-1",
-  closeButton: `${buttonBase} text-white bg-[var(--accent)] hover:opacity-90`,
+  footerEnd:
+    "flex items-center justify-end px-5 py-2 border-t border-gray-100 mt-1",
+  closeButton: `${buttonBase} text-white bg-accent hover:opacity-90`,
   cancelButton: `${buttonBase} text-gray-600 bg-white border border-gray-300 hover:bg-gray-50`,
   confirmButton: `${buttonBase} text-white bg-[#f01d3c] hover:bg-[#d01835]`,
 };
