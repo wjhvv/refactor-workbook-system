@@ -10,3 +10,8 @@ export const stepStyles = {
   connectorCompleted: "bg-accent",
   connectorPending: "bg-gray-200",
 };
+
+export const stepPlaceholderStyles = {
+  container: "flex flex-col flex-1 min-h-0 items-center justify-center gap-4 rounded-xl border-2 border-dashed border-gray-200",
+  label: "text-gray-400 text-sm",
+};

@@ -1,4 +1,5 @@
 import type { CSSProperties, RefObject } from "react";
+import { X } from "lucide-react";
 import { Dropdown } from "./Dropdown";
 import { DropdownItem } from "./DropdownItem";
 import { dropdownStyles } from "./dropdown.styles";
@@ -36,6 +37,8 @@ export function GroupPainterDropdown({
   onAssign,
   onClose,
 }: GroupPainterDropdownProps) {
+  const hasFooterItems = canAddGroup || hasAssigned;
+
   return (
     <Dropdown dropdownRef={dropdownRef} style={style} onClose={onClose}>
       {Array.from({ length: maxGroup }, (_, i) => i + 1).map((gNum) => (
@@ -48,27 +51,29 @@ export function GroupPainterDropdown({
         />
       ))}
 
-      <div className={dropdownStyles.divider}>
-        {canAddGroup && (
-          <DropdownItem
-            leading={
-              <span className="w-4 h-4 rounded border border-dashed border-gray-300 flex items-center justify-center text-[10px] text-gray-400">
-                +
-              </span>
-            }
-            label={`新增組 ${maxGroup + 1}`}
-            onClick={() => onAssign(maxGroup + 1)}
-          />
-        )}
-        {hasAssigned && (
-          <DropdownItem
-            leading={<span className="text-[10px]">✕</span>}
-            label="清除分組"
-            danger
-            onClick={() => onAssign(0)}
-          />
-        )}
-      </div>
+      {hasFooterItems && (
+        <div className={dropdownStyles.divider}>
+          {canAddGroup && (
+            <DropdownItem
+              leading={
+                <span className="w-4 h-4 rounded border border-dashed border-gray-300 flex items-center justify-center text-[10px] text-gray-400">
+                  +
+                </span>
+              }
+              label={`新增組 ${maxGroup + 1}`}
+              onClick={() => onAssign(maxGroup + 1)}
+            />
+          )}
+          {hasAssigned && (
+            <DropdownItem
+              leading={<X size={10} className="text-gray-400" />}
+              label="清除分組"
+              danger
+              onClick={() => onAssign(0)}
+            />
+          )}
+        </div>
+      )}
     </Dropdown>
   );
 }

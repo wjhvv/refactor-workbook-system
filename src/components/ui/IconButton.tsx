@@ -10,7 +10,7 @@ interface IconButtonProps {
 const variantStyles: Record<NonNullable<IconButtonProps["variant"]>, string> = {
   ghost: "text-gray-300 hover:text-gray-400 hover:!text-gray-600",
   danger: "text-gray-300 hover:text-gray-400 hover:!text-red-500",
-  primary: "text-gray-300 hover:text-gray-400 hover:!text-[#0087dc]",
+  primary: "text-gray-300 hover:text-gray-400 hover:!text-accent",
 };
 
 export function IconButton({

@@ -71,7 +71,7 @@ interface StepFlowProps {
   steps: StepConfig[];
   initialStep?: number;
   initialCompletedSteps?: number[];
-  onStateChange?: (activeStep: number, completedSteps: number[]) => void;
+  onStateChange?: (state: { activeStep: number; completedSteps: number[] }) => void;
 }
 
 export function StepFlow({
@@ -86,7 +86,7 @@ export function StepFlow({
   );
 
   function notify(next: { activeStep: number; completedSteps: Set<number> }) {
-    onStateChange?.(next.activeStep, [...next.completedSteps]);
+    onStateChange?.({ activeStep: next.activeStep, completedSteps: [...next.completedSteps] });
   }
 
   function handleComplete() {
