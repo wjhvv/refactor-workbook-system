@@ -43,9 +43,8 @@ export function ConfirmDialog({
   isOpen,
   ...cardProps
 }: ConfirmCardProps & { isOpen: boolean }) {
-  if (!isOpen) return null;
   return (
-    <DialogOverlay>
+    <DialogOverlay isOpen={isOpen}>
       <ConfirmCard {...cardProps} />
     </DialogOverlay>
   );
