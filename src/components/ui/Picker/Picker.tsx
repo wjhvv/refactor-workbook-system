@@ -1,4 +1,4 @@
-import { usePicker } from "../../../hooks/usePicker";
+import { usePicker } from "../../../hooks/ui/usePicker";
 import { pickerStyles } from "./picker.styles";
 import { PickerSearch } from "./PickerSearch";
 import { PickerControl } from "./PickerControl";

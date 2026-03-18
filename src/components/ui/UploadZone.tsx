@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { CloudUpload } from "lucide-react";
 import { filterFilesByAccept } from "../../utils/file";
-import { useFileDropZone } from "../../hooks/useFileDropZone";
+import { useFileDropZone } from "../../hooks/ui/useFileDropZone";
 
 interface UploadZoneProps {
   onUpload: (files: File[]) => void;
